@@ -4,6 +4,10 @@ namespace Sube2.HelloMvc.Models
 {
     public class OkulDbContext:DbContext
     {
+        public OkulDbContext(DbContextOptions options):base(options)
+        {
+            
+        }
         public DbSet<Ogrenci> Ogrenciler { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

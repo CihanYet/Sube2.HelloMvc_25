@@ -7,6 +7,14 @@ namespace Sube2.HelloMvc.Controllers
 {
     public class OgrenciController : Controller
     {
+        private readonly OkulDbContext _context;
+
+        public OgrenciController(OkulDbContext context)
+        {
+            _context = context;
+        }
+
+
         public ViewResult Index()//Action
         {
             return View("AnaSayfa");
@@ -37,11 +45,8 @@ namespace Sube2.HelloMvc.Controllers
 
         public ViewResult OgrenciListe()
         {
-            using (var ctx = new OkulDbContext())
-            {
-                var lst = ctx.Ogrenciler.ToList();
-                return View(lst);
-            }
+            var lst = _context.Ogrenciler.ToList();
+            return View(lst);
         }
 
         [HttpGet]
@@ -56,11 +61,10 @@ namespace Sube2.HelloMvc.Controllers
             int sonuc = 0;
             if (ogr != null)
             {
-                using (var ctx = new OkulDbContext())
-                {
-                    ctx.Ogrenciler.Add(ogr);
-                    sonuc = ctx.SaveChanges();
-                }
+
+                _context.Ogrenciler.Add(ogr);
+                sonuc = _context.SaveChanges();
+
             }
 
             if (sonuc > 0)
@@ -77,21 +81,23 @@ namespace Sube2.HelloMvc.Controllers
         [HttpGet]
         public IActionResult OgrenciDetay(int id)
         {
-            using (var ctx = new OkulDbContext())
-            {
-                var ogr = ctx.Ogrenciler.Find(id);
-                return View(ogr);
-            }
+            var ogr = _context.Ogrenciler.Find(id);
+            return View(ogr);
         }
 
         [HttpPost]
         public IActionResult OgrenciDetay(Ogrenci ogr)
         {
-            using (var ctx=new OkulDbContext())
-            {
-                ctx.Entry(ogr).State = EntityState.Modified;
-                ctx.SaveChanges();
-            }
+            _context.Entry(ogr).State = EntityState.Modified;
+            _context.SaveChanges();
+            return RedirectToAction("OgrenciListe");
+        }
+
+        public IActionResult OgrenciSil(int id)
+        {
+            var ogr = _context.Ogrenciler.Find(id);
+            _context.Ogrenciler.Remove(ogr);
+            _context.SaveChanges();
             return RedirectToAction("OgrenciListe");
         }
     }
